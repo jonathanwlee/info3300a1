@@ -40,10 +40,12 @@
 		};
 	}
 
-	document.getElementById("p2output").innerText = voterGenerator([0.4,0.3,.3])();
+	function likelyVoter() { 
+		return voterGenerator([0.42,0.38,0.2])();
 
+	}
+	document.getElementById("p2output").innerText = likelyVoter();
 	</script>
-
 </p>
 
 
@@ -54,7 +56,17 @@
 
 	<script>
 
-	document.getElementById("p3output").innerText = "TO DO";
+	function pollN(n, voter) { 
+		var results = [];
+		for (acc= 0; acc < n; acc++) { 
+			var poll = voter();
+			results.push(poll);
+		}
+		
+		return results;
+	}
+
+	document.getElementById("p3output").innerText = pollN(20,likelyVoter);
 	</script>
 
 </p>
