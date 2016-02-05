@@ -1,0 +1,61 @@
+
+<p>Problem 1 Voter Simulator: 
+
+
+	<div id="p1output"></div>
+
+	<script>
+	function uninformedVoter() { 
+		var randomNumber = Math.floor(Math.random() * 3);
+		var candidates = ["trump","cruz","rubio"];
+		return candidates[randomNumber];
+	}
+
+	document.getElementById("p1output").innerText = uninformedVoter();
+	</script>
+
+</p>
+
+<p>Problem 2 More Realistic Voter Simulator: 
+
+
+	<div id="p2output"></div>
+
+	<script>
+	function voterGenerator(probArray) {
+		return function() { 
+			var randomNum = Math.random();
+			//0 - 0.4
+			if (randomNum < probArray[0]) { 
+				return "trump " + randomNum;
+			}
+			//.41 - 0.7
+			else if (randomNum > probArray[0] && randomNum <= (probArray[1] + probArray[0])) {
+				return "cruz "  + randomNum;
+			}
+			//0.71 - 1 
+			else { 
+				return "rubio " + randomNum;
+			}
+		};
+	}
+
+	document.getElementById("p2output").innerText = voterGenerator([0.4,0.3,.3])();
+
+	</script>
+
+</p>
+
+
+<p>Problem 3 Poll Simulator: 
+
+
+	<div id="p3output"></div>
+
+	<script>
+
+	document.getElementById("p3output").innerText = "TO DO";
+	</script>
+
+</p>
+
