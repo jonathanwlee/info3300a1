@@ -1,6 +1,4 @@
-
 <p>Problem 1 Voter Simulator: 
-
 
 	<div id="p1output"></div>
 
@@ -12,12 +10,11 @@
 	}
 
 	document.getElementById("p1output").innerText = uninformedVoter();
-	</script>
 
+	</script>
 </p>
 
 <p>Problem 2 More Realistic Voter Simulator: 
-
 
 	<div id="p2output"></div>
 
@@ -25,17 +22,18 @@
 	function voterGenerator(probArray) {
 		return function() { 
 			var randomNum = Math.random();
-			//0 - 0.4
-			if (randomNum < probArray[0]) { 
-				return "trump " + randomNum;
+
+			//probArray[0]
+			if (randomNum <= probArray[0]) { 
+				return "trump";
 			}
-			//.41 - 0.7
-			else if (randomNum > probArray[0] && randomNum <= (probArray[1] + probArray[0])) {
-				return "cruz "  + randomNum;
+			//probArray[1]
+			else if (randomNum <= (probArray[0] + probArray[1])) {
+				return "cruz";
 			}
-			//0.71 - 1 
+			//probArray[2] 
 			else { 
-				return "rubio " + randomNum;
+				return "rubio";
 			}
 		};
 	}
@@ -71,3 +69,119 @@
 
 </p>
 
+<p>Problem 4 Declaring Victors: 
+
+
+	<div id="p4output"></div>
+
+	<script>
+	function uninformedVoterTies(candidateArray) { 
+		var randomNumber = Math.floor(Math.random() * candidateArray.length);
+		console.log(randomNumber + " " + candidateArray[randomNumber]);
+		return candidateArray[randomNumber];
+	}
+
+	function winner(n, voter) { 
+		var resultsArray = pollN(n,voter);
+		var trumpVotes =0;
+		var rubioVotes = 0;
+		var cruzVotes = 0;
+	
+		for (i=0; i < resultsArray.length;i++) { 
+			if (resultsArray[i] == "trump") { 
+				trumpVotes++;
+			}
+			else if (resultsArray[i] =="cruz") { 
+				cruzVotes++;
+			}
+			else if (resultsArray[i] == "rubio") { 
+				rubioVotes++;
+			}
+
+		}
+		 console.log(trumpVotes + " " + rubioVotes + " " + cruzVotes + " " + Math.max(trumpVotes,rubioVotes,cruzVotes));
+
+		var maxVotes = Math.max(trumpVotes,rubioVotes,cruzVotes);
+		if ((trumpVotes == maxVotes && rubioVotes == maxVotes)) { 
+			return uninformedVoterTies(["trump","rubio"]);
+		}
+
+		else if (trumpVotes == maxVotes && cruzVotes == maxVotes) { 
+			return uninformedVoterTies(["trump","cruz"]);
+		}
+
+		else if (cruzVotes == maxVotes && rubioVotes == maxVotes) { 
+			return uninformedVoterTies(["cruz","rubio"]);
+		}
+
+		else if (trumpVotes == maxVotes && rubioVotes == maxVotes && cruzVotes == maxVotes) { 
+			return uninformedVoter();
+		}
+
+		else { 
+			if (trumpVotes == maxVotes) { 
+				return "trump";
+			}
+			else if (cruzVotes == maxVotes) { 
+				return "cruz";
+			}
+			else if (rubioVotes == maxVotes) { 
+				return "rubio"
+			}
+		}
+	}
+
+	document.getElementById("p4output").innerText = winner(20,likelyVoter);
+
+	</script>
+
+</p>
+
+<p>Problem 5 Multiple Polls: 
+
+
+	<div id="p5output"></div>
+
+	<script>
+
+	function multiplePolls(n, k, voter) { 
+		var trumpVictories = 0;
+		for (run=0; run < k; run++) { 
+			var pollWinner = winner(n,voter); 
+			if (pollWinner == "trump") { 
+				trumpVictories++;
+			}
+		}
+		return trumpVictories;
+	}
+
+	document.getElementById("p5output").innerText = multiplePolls(100, 5, likelyVoter);
+	</script>
+
+</p>
+
+<p>Problem 6 Sample Size and Margin of Error: 
+
+	<div id="p6output"></div>
+
+	<script>
+
+	document.getElementById("p6output").innerText = "";
+	</script>
+
+</p>
+
+
+
+<p>Problem 7 Likely Voter From a Different State: 
+
+	<div id="p7output"></div>
+
+	<script>
+
+	document.getElementById("p7output").innerText = "";
+	</script>
+
+</p>
+
+ 
