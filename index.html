@@ -40,15 +40,13 @@
 
 	function likelyVoter() { 
 		return voterGenerator([0.42,0.38,0.2])();
-
 	}
+
 	document.getElementById("p2output").innerText = likelyVoter();
 	</script>
 </p>
 
-
 <p>Problem 3 Poll Simulator: 
-
 
 	<div id="p3output"></div>
 
@@ -77,17 +75,21 @@
 	<script>
 	function uninformedVoterTies(candidateArray) { 
 		var randomNumber = Math.floor(Math.random() * candidateArray.length);
-		console.log(randomNumber + " " + candidateArray[randomNumber]);
+		//Debug
+		//console.log(randomNumber + " " + candidateArray[randomNumber]);
 		return candidateArray[randomNumber];
 	}
 
 	function winner(n, voter) { 
 		var resultsArray = pollN(n,voter);
-		var trumpVotes =0;
+
+		//Debug
+		//console.log(resultsArray);
+		var trumpVotes = 0;
 		var rubioVotes = 0;
 		var cruzVotes = 0;
-	
-		for (i=0; i < resultsArray.length;i++) { 
+
+		for (var i=0; i < resultsArray.length;i++) { 
 			if (resultsArray[i] == "trump") { 
 				trumpVotes++;
 			}
@@ -99,9 +101,12 @@
 			}
 
 		}
-		 console.log(trumpVotes + " " + rubioVotes + " " + cruzVotes + " " + Math.max(trumpVotes,rubioVotes,cruzVotes));
+		
+		//Debugging
+		//console.log("Trump: " + " " + trumpVotes + " Rubio: " + rubioVotes + " Cruz:" + cruzVotes + " Max: " + Math.max(trumpVotes,rubioVotes,cruzVotes));
 
 		var maxVotes = Math.max(trumpVotes,rubioVotes,cruzVotes);
+		//Check for ties
 		if ((trumpVotes == maxVotes && rubioVotes == maxVotes)) { 
 			return uninformedVoterTies(["trump","rubio"]);
 		}
@@ -117,7 +122,7 @@
 		else if (trumpVotes == maxVotes && rubioVotes == maxVotes && cruzVotes == maxVotes) { 
 			return uninformedVoter();
 		}
-
+		//If no ties:
 		else { 
 			if (trumpVotes == maxVotes) { 
 				return "trump";
@@ -139,14 +144,13 @@
 
 <p>Problem 5 Multiple Polls: 
 
-
 	<div id="p5output"></div>
 
 	<script>
 
 	function multiplePolls(n, k, voter) { 
 		var trumpVictories = 0;
-		for (run=0; run < k; run++) { 
+		for (var i=0; i < k; i++) { 
 			var pollWinner = winner(n,voter); 
 			if (pollWinner == "trump") { 
 				trumpVictories++;
@@ -155,7 +159,7 @@
 		return trumpVictories;
 	}
 
-	document.getElementById("p5output").innerText = multiplePolls(100, 5, likelyVoter);
+	document.getElementById("p5output").innerText = "Number of Trump victories following 5 polls of 100 likely voters: " + multiplePolls(100, 5, likelyVoter);
 	</script>
 
 </p>
@@ -179,9 +183,12 @@
 
 	<script>
 
-	document.getElementById("p7output").innerText = "";
+	function likelyVoterFromDifferentState() { 
+		return voterGenerator([0.50,0.30,0.20])();
+	}
+
+	document.getElementById("p7output").innerText = "My correct preferences " + multiplePolls(100,10,likelyVoterFromDifferentState); 
 	</script>
 
 </p>
 
- 
