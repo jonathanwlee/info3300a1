@@ -1,0 +1,251 @@
+<p>Problem 1 Voter Simulator: 
+
+	<div id="p1output"></div>
+
+	<script>
+	function uninformedVoter() { 
+		var randomNumber = Math.floor(Math.random() * 3);
+		var candidates = ["trump","cruz","rubio"];
+		return candidates[randomNumber];
+	}
+
+	document.getElementById("p1output").innerText = uninformedVoter();
+
+	</script>
+</p>
+
+<p>Problem 2 More Realistic Voter Simulator: 
+
+	<div id="p2output"></div>
+
+	<script>
+	function voterGenerator(probArray) {
+		return function() { 
+			var randomNum = Math.random();
+
+			//probArray[0]
+			if (randomNum <= probArray[0]) { 
+				return "trump";
+			}
+			//probArray[1]
+			else if (randomNum <= (probArray[0] + probArray[1])) {
+				return "cruz";
+			}
+			//probArray[2] 
+			else { 
+				return "rubio";
+			}
+		};
+	}
+
+	function likelyVoter() { 
+		return voterGenerator([0.42,0.38,0.2])();
+	}
+
+	document.getElementById("p2output").innerText = likelyVoter();
+	</script>
+</p>
+
+<p>Problem 3 Poll Simulator: 
+
+	<div id="p3output"></div>
+
+	<script>
+
+	function pollN(n, voter) { 
+		var results = [];
+		for (acc= 0; acc < n; acc++) { 
+			var poll = voter();
+			results.push(poll);
+		}
+		
+		return results;
+	}
+
+	document.getElementById("p3output").innerText = pollN(20,likelyVoter);
+	</script>
+
+</p>
+
+<p>Problem 4 Declaring Victors: 
+
+
+	<div id="p4output"></div>
+
+	<script>
+	function uninformedVoterTies(candidateArray) { 
+		var randomNumber = Math.floor(Math.random() * candidateArray.length);
+		//Debug
+		//console.log(randomNumber + " " + candidateArray[randomNumber]);
+		return candidateArray[randomNumber];
+	}
+
+	function winner(n, voter) { 
+		var resultsArray = pollN(n,voter);
+
+		//Debug
+		//console.log(resultsArray);
+		var trumpVotes = 0;
+		var rubioVotes = 0;
+		var cruzVotes = 0;
+
+		for (var i=0; i < resultsArray.length;i++) { 
+			if (resultsArray[i] == "trump") { 
+				trumpVotes++;
+			}
+			else if (resultsArray[i] =="cruz") { 
+				cruzVotes++;
+			}
+			else if (resultsArray[i] == "rubio") { 
+				rubioVotes++;
+			}
+
+		}
+		
+		//Debugging
+		//console.log("Trump: " + " " + trumpVotes + " Rubio: " + rubioVotes + " Cruz:" + cruzVotes + " Max: " + Math.max(trumpVotes,rubioVotes,cruzVotes));
+
+		var maxVotes = Math.max(trumpVotes,rubioVotes,cruzVotes);
+		//Check for ties
+		if ((trumpVotes == maxVotes && rubioVotes == maxVotes)) { 
+			return uninformedVoterTies(["trump","rubio"]);
+		}
+
+		else if (trumpVotes == maxVotes && cruzVotes == maxVotes) { 
+			return uninformedVoterTies(["trump","cruz"]);
+		}
+
+		else if (cruzVotes == maxVotes && rubioVotes == maxVotes) { 
+			return uninformedVoterTies(["cruz","rubio"]);
+		}
+
+		else if (trumpVotes == maxVotes && rubioVotes == maxVotes && cruzVotes == maxVotes) { 
+			return uninformedVoter();
+		}
+		//If no ties:
+		else { 
+			if (trumpVotes == maxVotes) { 
+				return "trump";
+			}
+			else if (cruzVotes == maxVotes) { 
+				return "cruz";
+			}
+			else if (rubioVotes == maxVotes) { 
+				return "rubio"
+			}
+		}
+	}
+
+	document.getElementById("p4output").innerText = winner(20,likelyVoter);
+
+	</script>
+
+</p>
+
+<p>Problem 5 Multiple Polls: 
+
+	<div id="p5output"></div>
+
+	<script>
+
+	function multiplePolls(n, k, voter) { 
+		var trumpVictories = 0;
+		for (var i=0; i < k; i++) { 
+			var pollWinner = winner(n,voter); 
+			if (pollWinner == "trump") { 
+				trumpVictories++;
+			}
+		}
+		return trumpVictories;
+	}
+
+	document.getElementById("p5output").innerText = "Number of Trump victories following 5 polls of 100 likely voters: " + multiplePolls(100, 5, likelyVoter);
+	</script>
+
+</p>
+
+<p>Problem 6 Sample Size and Margin of Error: 
+	
+	<div>
+		I started by keeping the 5 polls from previous problems constant and beginning with low number of voters to high. Over a course of trial and error, I found that over 5 polls with 500 or more voters, the "correct" winner more or less had the majority. With voters over 500, the margin of error to not have the correct winner identified more than 3/5 times was small. Above 750 voters, the poll was rarely ever lower than 4/5. In the second round of trials, I held voters constant at 200 and gradually increased the number of polls conducted. I added in a Percentage Correct category to track the percentage the winner gained over each trial. A trend I noticed after observation over a number of courses was that high number of polls such as 100 or 200 and above were generally consistent in their predictions hovering around 72 plus or minus a few percentage points. In contrast, lower number of polls had much higher variability from 50 percent correct all the way to 90. Intuitively, my observations make logical sense. The greater number of voters, the less likelihood of outliers can affect the end result. As the amount of voters increases, the consistency of the poll increases and the winner is largely correct. With greater number of polls, our poll overall becomes more consistent but not necessarily more accurate.
+	</div>
+	<br>
+
+	<!-- Trial Outputs -->
+	<div id="p6output"></div>
+	<div id = "trial1"></div>
+	<div id = "trial2"></div>
+	<div id = "trial3"></div>
+	<div id = "trial4"></div>
+	<div id = "trial5"></div>
+	<div id = "trial6"></div>
+	<div id = "trial7"></div>
+	<div id = "trial8"></div>
+	<div id = "trial9"></div>
+	<div id = "trial10"></div>
+	<br>
+	<div id = "trial11"></div>
+	<div id = "trial12"></div>
+	<div id = "trial13"></div>
+	<div id = "trial14"></div>
+	<div id = "trial15"></div>
+	<div id = "trial16"></div>
+	<div id = "trial17"></div>
+	<div id = "trial18"></div>
+
+
+	<script>
+	//Trial Outputs holding polls constant and increasing voters
+	document.getElementById("p6output").innerText = "Number of Trump victories following 5 likely voters and 5 polls: " + multiplePolls(5,5,likelyVoter);
+	document.getElementById("trial1").innerText = "Number of Trump victories following 10 likely voters and 5 polls: " + multiplePolls(10,5,likelyVoter);
+	document.getElementById("trial2").innerText = "Number of Trump victories following 20 likely voters and 5 polls: " + multiplePolls(20,2,likelyVoter);
+	document.getElementById("trial3").innerText = "Number of Trump victories following 50 likely voters and 5 polls: " + multiplePolls(50,5,likelyVoter);
+	document.getElementById("trial4").innerText = "Number of Trump victories following 100 likely voters and 5 polls: " + multiplePolls(100,5,likelyVoter);
+	document.getElementById("trial5").innerText = "Number of Trump victories following 150 likely voters and 5 polls: " + multiplePolls(150,5,likelyVoter);
+	document.getElementById("trial6").innerText = "Number of Trump victories following 200 likely voters and 5 polls: " + multiplePolls(200,5,likelyVoter);
+	document.getElementById("trial7").innerText = "Number of Trump victories following 500 likely voters and 5 polls: " + multiplePolls(500,5,likelyVoter);
+	document.getElementById("trial8").innerText = "Number of Trump victories following 750 likely voters and 5 polls: " + multiplePolls(750,5,likelyVoter);
+	document.getElementById("trial9").innerText = "Number of Trump victories following 1000 likely voters and 5 polls: " + multiplePolls(1000,5,likelyVoter);
+	document.getElementById("trial10").innerText = "Number of Trump victories following 2000 likely voters and 5 polls: " + multiplePolls(2000,5,likelyVoter);
+
+	//Poll Results
+	var poll1 = multiplePolls(200,10,likelyVoter);
+	var poll2 = multiplePolls(200,15,likelyVoter);
+	var poll3 = multiplePolls(200,25,likelyVoter);
+	var poll4 = multiplePolls(200,50,likelyVoter);
+	var poll5 = multiplePolls(200,100,likelyVoter);
+	var poll6 = multiplePolls(200,200,likelyVoter);
+	var poll7 = multiplePolls(200,500,likelyVoter);
+	var poll8 = multiplePolls(200,1000,likelyVoter);
+
+	//Trial Outputs holding Voters Constant and Polls Gradually Increasing
+	document.getElementById("trial11").innerText = "Number of Trump victories following 200 likely voters and 10 polls: " + poll1 + " Percent Correct: " + Math.floor(poll1/10*100) + "%" ;
+	document.getElementById("trial12").innerText = "Number of Trump victories following 200 likely voters and 15 polls: " + poll2 + " Percent Correct: " + Math.floor(poll2/15*100) + "%" ;
+	document.getElementById("trial13").innerText = "Number of Trump victories following 200 likely voters and 25 polls: " + poll3 + " Percent Correct: " + Math.floor(poll3/25*100) + "%" ;
+	document.getElementById("trial14").innerText = "Number of Trump victories following 200 likely voters and 50 polls: " + poll4 + " Percent Correct: " + Math.floor(poll4/50*100) + "%" ;
+	document.getElementById("trial15").innerText = "Number of Trump victories following 200 likely voters and 100 polls: " + poll5 + " Percent Correct: " + Math.floor(poll5/100*100) + "%";
+	document.getElementById("trial16").innerText = "Number of Trump victories following 200 likely voters and 200 polls: " + poll6 + " Percent Correct: " + Math.floor(poll6/200*100) + "%";
+	document.getElementById("trial17").innerText = "Number of Trump victories following 200 likely voters and 500 polls: " + poll7 + " Percent Correct: " + Math.floor(poll7/500*100) + "%";
+	document.getElementById("trial18").innerText = "Number of Trump victories following 200 likely voters and 1000 polls: " + poll8 + " Percent Correct: " + Math.floor(poll8/1000*100) + "%" ;
+	</script>
+
+</p>
+
+<p>Problem 7 Likely Voter From a Different State: 
+
+	<div id="p7output"></div>
+	<br>
+	<div>
+		My alternate correct preferences were increased to 0.50 for Trump from 0.42, and decreased Cruz from 0.38 to 0.30. By increasing the percentage chance 
+		for Trump, we ensure that with the new distribution, the voters needed for an accurate poll are reduced. Since the percentage chance for the "correct" winner is higher, we do not need as many voters since the likelihood is lower that Trump will not win in a poll. When the weighted support is lower for the correct winner, we require a higher number of voters to make sure that anomalies don't affect the accuracy of the end result. 
+	</div>
+
+		<script>
+		function likelyVoterFromDifferentState() { 
+			return voterGenerator([0.50,0.30,0.20])();
+		}
+
+		document.getElementById("p7output").innerText = "Trump victories for my alternate correct preferences [0.50,0.30,0.20] : " + multiplePolls(50,5,likelyVoterFromDifferentState); 
+		</script>
+</p>
+
