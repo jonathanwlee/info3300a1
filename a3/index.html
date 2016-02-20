@@ -1,0 +1,52 @@
+<html>
+<head>
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+<body>
+<svg height="200" width="200"></svg>
+
+<script>
+var padding = 30;
+var svg = d3.select("svg");
+var height = svg.attr("height");
+var width = svg.attr("width");
+
+var xScale = d3.scale.linear().domain([1,9]).range([padding, width-padding]);	
+var yScale = d3.scale.linear().domain([1,80]).range([height-padding,padding]);
+
+svg.append("circle").attr("cx", xScale(2)).attr("cy", yScale(4)).attr("r", 5);
+
+svg.append("circle").attr("cx", xScale(1)).attr("cy", yScale(1)).attr("r", 5);
+
+svg.append("rect").attr("x", xScale(4)).attr("y", yScale(15)).attr("width",10).attr("height",10);
+
+svg.append("rect").attr("x", xScale(9)).attr("y", yScale(80)).attr("width",10).attr("height",10);
+
+var xAxis = d3.svg.axis().scale(xScale).orient("bottom")
+.ticks(5);
+var yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+//Axis 
+svg.append("g").attr("transform", "translate(0," + (height - padding) + ")").attr("class", "axis")
+.call(xAxis);
+svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis")
+.call(yAxis);
+
+d3.selectAll("circle").on( {
+	"click" : function() { 
+		d3.select(this).attr("fill","blue");
+	}
+});
+
+d3.selectAll("rect").on( {
+	"click" : function() { 
+		d3.select(this).attr("fill","blue");
+	}
+});
+
+
+</script> 
+</body> 
+
+
+</html>
