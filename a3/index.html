@@ -1,36 +1,68 @@
 <html>
 <head>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<style>
+svg { border: solid black 1px;}
+
+.axis path { fill: none; stroke: black; }
+.axis line { stroke: black; shape-rendering: crispEdges;}
+.axis text { font: 0px sans-serif; }
+
+.axisp2A text { font: 6px sans-serif;}
+.axisp2A path { fill: none; stroke: black; }
+.axisp2A line { stroke: black; }
+
+.p1AxisLabels 
+{ 
+	text-anchor:middle;
+	alignment-baseline:middle;
+	font-size: 12px;
+	font-family: sans-serif;
+	}
+
+.p1AxisTitle { 
+	text-anchor:middle;
+	alignment-baseline:middle;
+	font-size: 14px;
+	font-family: sans-serif;
+
+}
+
+.textp2A { font:7px sans-serif;}
+
+
+</style>
 </head>
 <body>
-<svg height="200" width="200"></svg>
-
+<p>
 <script>
+var svgp1 = d3.select("body").append("svg").attr("width",200).attr("height",200);
 var padding = 30;
-var svg = d3.select("svg");
-var height = svg.attr("height");
-var width = svg.attr("width");
+var height = svgp1.attr("height");
+var width = svgp1.attr("width");
 
-var xScale = d3.scale.linear().domain([1,9]).range([padding, width-padding]);	
-var yScale = d3.scale.linear().domain([1,80]).range([height-padding,padding]);
+var xScale = d3.scale.linear().domain([1,10]).range([padding, width-padding]);	
+var yScale = d3.scale.linear().domain([1,90]).range([height-padding,padding]);
 
-svg.append("circle").attr("cx", xScale(2)).attr("cy", yScale(4)).attr("r", 5);
 
-svg.append("circle").attr("cx", xScale(1)).attr("cy", yScale(1)).attr("r", 5);
+svgp1.append("circle").attr("cx", xScale(2)).attr("cy", yScale(4)).attr("r", 5);
+svgp1.append("circle").attr("cx", xScale(1)).attr("cy", yScale(1)).attr("r", 5);
+svgp1.append("rect").attr("x", xScale(4)).attr("y", yScale(15)).attr("width",10).attr("height",10);
+svgp1.append("rect").attr("x", xScale(9)).attr("y", yScale(80)).attr("width",10).attr("height",10);
 
-svg.append("rect").attr("x", xScale(4)).attr("y", yScale(15)).attr("width",10).attr("height",10);
+svgp1.append("text").attr("x","50%").attr("y","195").text("A").attr("class","p1AxisLabels");
+svgp1.append("text").attr("x","5").attr("y","50%").text("C").attr("class","p1AxisLabels");
+svgp1.append("text").attr("x","50%").attr("y","15").text("Title").attr("class","p1AxisTitle");
 
-svg.append("rect").attr("x", xScale(9)).attr("y", yScale(80)).attr("width",10).attr("height",10);
 
-var xAxis = d3.svg.axis().scale(xScale).orient("bottom")
-.ticks(5);
-var yAxis = d3.svg.axis().scale(yScale).orient("left");
+var xAxisp1 = d3.svg.axis().scale(xScale).orient("bottom").innerTickSize(10).outerTickSize(0).tickValues([2,3,4,5,6,7,8,9]).ticks(8);
+var yAxisp1 = d3.svg.axis().scale(yScale).orient("left").ticks(7).innerTickSize(10).outerTickSize(0).tickValues([10,20,30,40,50,60,70,80]);
 
 //Axis 
-svg.append("g").attr("transform", "translate(0," + (height - padding) + ")").attr("class", "axis")
-.call(xAxis);
-svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis")
-.call(yAxis);
+svgp1.append("g").attr("transform", "translate(0," + (height - padding) + ")").attr("class", "axis")
+.call(xAxisp1);
+svgp1.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis")
+.call(yAxisp1);
 
 d3.selectAll("circle").on( {
 	"click" : function() { 
@@ -43,9 +75,55 @@ d3.selectAll("rect").on( {
 		d3.select(this).attr("fill","blue");
 	}
 });
-
-
 </script> 
+</p>
+
+<p>
+<script>
+var wordRanks = [{rank: 1, count: 15342397280, word: "of"},
+{rank: 2, count: 7611765281, word: "in"},
+{rank: 4, count: 11021132912, word: "and"},
+{rank: 8, count: 3021925527, word: "for"},
+{rank: 16, count: 1562321315, word: "at"},
+{rank: 32, count: 746702714, word: "more"},
+{rank: 64, count: 652703221, word: "its"},
+{rank: 128, count: 186584246, word: "different"},
+{rank: 256, count: 102237666, word: "light"},
+{rank: 512, count: 44824164, word: "middle"},
+{rank: 1024, count: 34340679, word: "additional"},
+{rank: 2048, count: 11864923, word: "abandoned"},
+{rank: 4096, count: 7506730, word: "motive"},
+{rank: 8192, count: 10615754, word: "Die"},
+{rank: 16384, count: 907890, word: "portrays"},
+{rank: 32768, count: 226851, word: "Fundamentally"},
+{rank: 65536, count: 144913, word: "dv"}];
+
+var svgp2 = d3.select("body").append("svg").attr("width",200).attr("height",200);
+var paddingp2A = 35;
+var yScalep2 = d3.scale.linear().domain([1,15342397280]).range([height-paddingp2A,paddingp2A]);
+var xScalep2 = d3.scale.linear().domain([1,65536]).range([paddingp2A,width-paddingp2A]);
+
+
+wordRanks.forEach(function(obj) { 
+	svgp2.append("text").attr("x",xScalep2(obj["rank"])).attr("y",yScalep2(obj["count"])).text(obj["word"]).attr("class","textp2A");
+});
+
+var xAxisp2 = d3.svg.axis().scale(xScalep2).orient("bottom").ticks(6).tickFormat(d3.format("s"));
+var yAxisp2 = d3.svg.axis().scale(yScalep2).orient("left").tickFormat(d3.format("s"));
+
+//Axis 
+svgp2.append("g").attr("transform", "translate(0," + (height - paddingp2A) + ")").attr("class", "axisp2A")
+.call(xAxisp2);
+svgp2.append("g").attr("transform", "translate(" + paddingp2A + ",0)").attr("class", "axisp2A")
+.call(yAxisp2);
+
+var svgp3 = d3.select("body").append("svg").attr("width",200).attr("height",200);
+
+
+</script>
+
+
+</p>
 </body> 
 
 
