@@ -2,11 +2,67 @@
 <head>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <style>
+.bar { fill:green;}
 </style>
 </head>
 <body>
-	
+
+<div id="p1"></div>
 <script>
+
+function plotHistogram(elementID,numbersArray) {
+	var histogram = d3.layout.histogram();
+	data = histogram(numbersArray);
+
+	var height = 400;
+	var width = 500;
+	var padding = 40;
+	var svg = d3.select(elementID).append("svg").attr("height",height).attr("width",width);
+
+	var xScale = d3.scale.linear().domain([0,d3.max(numbersArray)]).range([padding,width-padding]);
+
+	var yScale = d3.scale.linear()
+	.domain([0,
+		d3.max(data, function (d) {
+			 return d.y;
+		 }) ])
+	.range([height - padding, padding]);
+
+	var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+	svg.append("g")
+	    .attr("class", "x axis")
+	    .attr("transform", "translate(0," + (height-padding) + ")")
+	    .call(xAxis);
+
+	data.forEach(function (bin) {
+		svg.append("rect").attr("class", "bar")
+		.attr("x", xScale(bin.x))
+		.attr("y", yScale(bin.y))
+		.attr("width", xScale(width))
+		.attr("height", yScale(0) - yScale(bin.y));});
+}
+
+
+function gaussian() { 
+	return d3.random.normal(0.0,1.0)(Math.random());	
+}
+
+function gaussian1000() {
+	var gaussianArray = [];
+	for (i=0;i<1000;i++) {
+		gaussianArray.push(gaussian());
+	}
+
+	console.log(gaussianArray);
+	plotHistogram("#p1",gaussianArray);
+}
+
+gaussian1000();
+
+function lognormal1000() {}
+function exponential1000() {}
+function gamma1000() { }
+function cauchy1000() {}
 
 </script>
 
