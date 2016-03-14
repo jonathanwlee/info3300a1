@@ -12,11 +12,37 @@
 </head>
 <body>
 
-<div id="p1"></div>
-<div id="p2"></div>
+<h2>Normal Distribution</h2>
+<div id="normalDis"></div>
+
+<h2>Normal Distribution Mean</h2>
+<div id="normalMeanDis"></div>
+
+<h2>Lognormal Distribution</h2>
+<div id="lognormalDis"></div>
+
+<h2>Lognormal Mean Distribution</h2>
+<div id="lognormalMeanDis"></div>
+
+<h2>Exponential Distribution</h2>
+<div id="expoDis"></div>
+
+<h2>Exponential Mean Distribution</h2>
+<div id="expoMeanDis"></div>
+
+<h2>Gamma Distribution</h2>
+<div id="gammaDis"></div>
+
+<h2>Gamma Mean Distribution</h2>
+<div id="gammaMeanDis"></div>
+
+<h2>Cauchy Distribution</h2>
+<div id="cauchyDis"></div>
+
+<h2>Cauchy Mean Distribution</h2>
+<div id="cauchyMeanDis"></div>
 
 <script>
-
 function plotHistogram(elementID,numbersArray) {
 	var numberBins = 40;
 	var histogram = d3.layout.histogram().bins(numberBins);
@@ -32,7 +58,7 @@ function plotHistogram(elementID,numbersArray) {
 	var yScale = d3.scale.linear()
 	.domain([0,
 		d3.max(data, function (d) {
-			console.log(d.y);
+			//console.log(d.y);
 			 return d.y;
 		 }) ])
 	.range([height- padding, padding]);
@@ -59,6 +85,7 @@ function plotHistogram(elementID,numbersArray) {
 
 function gaussian() { 
 	return d3.random.normal(0.0,1.0)(Math.random());	
+	//return Math.random(d3.random.normal(0.0,1.0));
 }
 
 function gaussian1000() {
@@ -79,20 +106,81 @@ function gaussian100mean() {
 
 	return gaussianMeanArray;
 }
-//plotHistogram("#p1",[1,1,1,1,1,1,1,1,2,1.9,1.95,2,2.1]);
-
-plotHistogram("#p1",gaussian1000());
-plotHistogram("#p2",gaussian100mean());
-
 
 function lognormal1000() {
-
-
-	
+	var lognormalArray = [];
+	for (d=0;d<1000;d++) { 
+		lognormalArray.push(Math.exp(gaussian()));
+	}
+	return lognormalArray;
 }
-function exponential1000() {}
+
+function lognormalmean100() {
+	var lognormalmeanArray = [];
+	for (c=0;c<100;c++) { 
+		lognormalmeanArray.push(d3.mean(lognormal1000()));
+	}
+
+	return lognormalmeanArray;
+}
+
+function exponential1000() {
+	var exponentialArray = [];
+	for (a=0;a<1000;a++) { 
+		exponentialArray.push(-Math.log(Math.random()));
+	}
+	return exponentialArray;
+
+}
+
+function exponentialmean100() { 
+	var exponentialmeanArray = [];
+	for (b=0;b<100;b++) { 
+		exponentialmeanArray.push(d3.mean(exponential1000()));
+	}
+
+	return exponentialmeanArray;
+
+
+}
+
+
 function gamma1000() { }
-function cauchy1000() {}
+
+function gammamean100() { }
+
+function cauchy1000() {
+	var cauchyArray = [];
+	for (x=0;x<1000;x++) { 
+		cauchyArray.push((gaussian()/gaussian()));
+		console.log(gaussian()/gaussian());
+	}
+
+	return cauchyArray;
+}
+
+function cauchymean100() {
+	var cauchymeanArray = [];
+	for (y=0;y<100;y++) { 
+		cauchymeanArray.push(d3.mean(cauchy1000()));
+	}
+
+	return cauchymeanArray;
+
+}
+
+
+plotHistogram("#normalDis",gaussian1000());
+plotHistogram("#normalMeanDis",gaussian100mean());
+plotHistogram("#lognormalDis",lognormal1000());
+plotHistogram("#lognormalMeanDis",lognormalmean100());
+
+plotHistogram("#expoDis",exponential1000());
+plotHistogram("#expoMeanDis",exponentialmean100());
+
+//plotHistogram("#cauchyDis",cauchy1000());
+//plotHistogram("#cauchyMeanDis",cauchymean100());
+
 
 </script>
 
