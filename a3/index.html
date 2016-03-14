@@ -2,7 +2,7 @@
 <head>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <style>
-svg { border: solid black 1px;}
+svg { border: solid black 1px; }
 
 .axis path { fill: none; stroke: black; }
 .axis line { stroke: black; shape-rendering: crispEdges;}
@@ -80,6 +80,8 @@ d3.selectAll("rect").on( {
 
 <p>
 <script>
+
+/*Problem 2A*/
 var wordRanks = [{rank: 1, count: 15342397280, word: "of"},
 {rank: 2, count: 7611765281, word: "in"},
 {rank: 4, count: 11021132912, word: "and"},
@@ -98,18 +100,20 @@ var wordRanks = [{rank: 1, count: 15342397280, word: "of"},
 {rank: 32768, count: 226851, word: "Fundamentally"},
 {rank: 65536, count: 144913, word: "dv"}];
 
+
 var svgp2 = d3.select("body").append("svg").attr("width",200).attr("height",200);
 var paddingp2A = 35;
-var yScalep2 = d3.scale.linear().domain([1,15342397280]).range([height-paddingp2A,paddingp2A]);
-var xScalep2 = d3.scale.linear().domain([1,65536]).range([paddingp2A,width-paddingp2A]);
+
+var yScalep2A = d3.scale.linear().domain([1,16000000000]).range([height-paddingp2A,paddingp2A]);
+var xScalep2A = d3.scale.linear().domain([1,70000]).range([paddingp2A,width-paddingp2A]);
 
 
 wordRanks.forEach(function(obj) { 
-	svgp2.append("text").attr("x",xScalep2(obj["rank"])).attr("y",yScalep2(obj["count"])).text(obj["word"]).attr("class","textp2A");
+	svgp2.append("text").attr("x",xScalep2A(obj["rank"])).attr("y",yScalep2A(obj["count"])).text(obj["word"]).attr("class","textp2A");
 });
 
-var xAxisp2 = d3.svg.axis().scale(xScalep2).orient("bottom").ticks(6).tickFormat(d3.format("s"));
-var yAxisp2 = d3.svg.axis().scale(yScalep2).orient("left").tickFormat(d3.format("s"));
+var xAxisp2 = d3.svg.axis().scale(xScalep2A).orient("bottom").ticks(6).tickFormat(d3.format("s"));
+var yAxisp2 = d3.svg.axis().scale(yScalep2A).orient("left").tickFormat(d3.format("s"));
 
 //Axis 
 svgp2.append("g").attr("transform", "translate(0," + (height - paddingp2A) + ")").attr("class", "axisp2A")
@@ -117,14 +121,56 @@ svgp2.append("g").attr("transform", "translate(0," + (height - paddingp2A) + ")"
 svgp2.append("g").attr("transform", "translate(" + paddingp2A + ",0)").attr("class", "axisp2A")
 .call(yAxisp2);
 
-var svgp3 = d3.select("body").append("svg").attr("width",200).attr("height",200);
+/*Problem 2B*/
 
+var yScalep2B = d3.scale.linear().domain([1,Math.log10(16000000000)]).range([height-paddingp2A,paddingp2A]);
+var xScalep2B = d3.scale.linear().domain([1,Math.log10(70000)]).range([paddingp2A,width-paddingp2A]);
+
+
+var svgp2B = d3.select("body").append("svg").attr("width",200).attr("height",200);
+
+wordRanks.forEach(function(obj) { 
+	svgp2B.append("text").attr("x",xScalep2B(Math.log10(obj["rank"]))).attr("y",yScalep2B(Math.log10(obj["count"]))).text(obj["word"]).attr("class","textp2A");
+});
+
+var xAxisp2B = d3.svg.axis().scale(xScalep2B).orient("bottom").ticks(6).tickFormat(d3.format("s"));
+var yAxisp2B = d3.svg.axis().scale(yScalep2B).orient("left").tickFormat(d3.format("s"));
+
+//Axis 
+svgp2B.append("g").attr("transform", "translate(0," + (height - paddingp2A) + ")").attr("class", "axisp2A")
+.call(xAxisp2B);
+svgp2B.append("g").attr("transform", "translate(" + paddingp2A + ",0)").attr("class", "axisp2A")
+.call(yAxisp2B);
+
+/*Problem 2C*/
+var svgp2C = d3.select("body").append("svg").attr("width",200).attr("height",200);
+var yScalep2C = d3.scale.log().domain([1,16000000000]).range([height-paddingp2A,paddingp2A]).nice();
+var xScalep2C = d3.scale.log().domain([1,70000]).range([paddingp2A,width-paddingp2A]).nice();
+
+wordRanks.forEach(function(obj) { 
+	svgp2C.append("text").attr("x",xScalep2C(obj["rank"])).attr("y",yScalep2C(obj["count"])).text(obj["word"]).attr("class","textp2A");
+});
+
+var xAxisp2C = d3.svg.axis().scale(xScalep2C).orient("bottom").ticks(6);
+var yAxisp2C = d3.svg.axis().scale(yScalep2C).orient("left").ticks(10);
+
+//Axis 	
+svgp2C.append("g").attr("transform", "translate(0," + (height - paddingp2A) + ")").attr("class", "axisp2A")
+.call(xAxisp2C);
+svgp2C.append("g").attr("transform", "translate(" + paddingp2A + ",0)").attr("class", "axisp2A")
+.call(yAxisp2C);
 
 </script>
-
-
 </p>
+
+<p> 
+<script>
+
+/*Problem 4*/
+
+var map = d3.select("body").append("div").attr("height","500").attr("width","960").attr("id","map");
+</script>
+</p> 
+		
 </body> 
-
-
 </html>

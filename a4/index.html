@@ -2,46 +2,60 @@
 <head>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <style>
-.bar { fill:green;}
+.bar {fill:green;}
+
+.axis path { fill: none; stroke: black; }
+.axis line { stroke: black; shape-rendering: crispEdges;}
+.axis text { font: 12px sans-serif; }
+
 </style>
 </head>
 <body>
 
 <div id="p1"></div>
+<div id="p2"></div>
+
 <script>
 
 function plotHistogram(elementID,numbersArray) {
-	var histogram = d3.layout.histogram();
+	var numberBins = 40;
+	var histogram = d3.layout.histogram().bins(numberBins);
 	data = histogram(numbersArray);
 
-	var height = 400;
-	var width = 500;
+	var height = 500;
+	var width = 1000;
 	var padding = 40;
 	var svg = d3.select(elementID).append("svg").attr("height",height).attr("width",width);
 
-	var xScale = d3.scale.linear().domain([0,d3.max(numbersArray)]).range([padding,width-padding]);
+	var xScale = d3.scale.linear().domain([d3.min(numbersArray),d3.max(numbersArray)]).range([padding,width-padding]);
 
 	var yScale = d3.scale.linear()
 	.domain([0,
 		d3.max(data, function (d) {
+			console.log(d.y);
 			 return d.y;
 		 }) ])
-	.range([height - padding, padding]);
+	.range([height- padding, padding]);
 
-	var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+	var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(20);
 	svg.append("g")
 	    .attr("class", "x axis")
 	    .attr("transform", "translate(0," + (height-padding) + ")")
 	    .call(xAxis);
 
+	var yAxisp = d3.svg.axis().scale(yScale).orient("left");
+	svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis")
+	.call(yAxisp);
+
+	console.log(xScale(0));
+
 	data.forEach(function (bin) {
 		svg.append("rect").attr("class", "bar")
 		.attr("x", xScale(bin.x))
 		.attr("y", yScale(bin.y))
-		.attr("width", xScale(width))
+		.attr("width", width/numberBins)
 		.attr("height", yScale(0) - yScale(bin.y));});
 }
-
 
 function gaussian() { 
 	return d3.random.normal(0.0,1.0)(Math.random());	
@@ -53,13 +67,29 @@ function gaussian1000() {
 		gaussianArray.push(gaussian());
 	}
 
-	console.log(gaussianArray);
-	plotHistogram("#p1",gaussianArray);
+	return gaussianArray; 
 }
 
-gaussian1000();
+function gaussian100mean() { 
+	var gaussianMeanArray = [];
+	for (k=0;k<100;k++) { 
+		var gaussianArray = gaussian1000();
+		gaussianMeanArray.push(d3.mean(gaussianArray));
+	}
 
-function lognormal1000() {}
+	return gaussianMeanArray;
+}
+//plotHistogram("#p1",[1,1,1,1,1,1,1,1,2,1.9,1.95,2,2.1]);
+
+plotHistogram("#p1",gaussian1000());
+plotHistogram("#p2",gaussian100mean());
+
+
+function lognormal1000() {
+
+
+	
+}
 function exponential1000() {}
 function gamma1000() { }
 function cauchy1000() {}
