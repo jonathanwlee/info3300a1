@@ -145,9 +145,29 @@ function exponentialmean100() {
 }
 
 
-function gamma1000() { }
+function gamma1000() {
+	var gammaArray = [];
+	for (g=0;g<1000;g++) { 
+		var gammaSample;
+		for (n=0;n<10;n++) {
+			gammaSample = gammaSample + -Math.log(Math.random());
+			//console.log("ran" + n);
+		}
+		gammaArray.push(gammaSample);
+		gammaSample = 0;
+	}
+	return gammaArray;
 
-function gammamean100() { }
+ }
+
+function gammamean100() { 
+	var gammameanArray = [];
+	for (gm=0;gm<100;gm++) { 
+		gammameanArray.push(d3.mean(gamma1000()));
+	}
+
+	return gammameanArray;
+}
 
 function cauchy1000() {
 	var cauchyArray = [];
@@ -178,9 +198,12 @@ plotHistogram("#lognormalMeanDis",lognormalmean100());
 plotHistogram("#expoDis",exponential1000());
 plotHistogram("#expoMeanDis",exponentialmean100());
 
-//plotHistogram("#cauchyDis",cauchy1000());
-//plotHistogram("#cauchyMeanDis",cauchymean100());
+plotHistogram("#cauchyDis",cauchy1000());
+plotHistogram("#cauchyMeanDis",cauchymean100());
 
+
+plotHistogram("#gammaDis",gamma1000());
+plotHistogram("#gammaMeanDis",gammamean100());
 
 </script>
 
