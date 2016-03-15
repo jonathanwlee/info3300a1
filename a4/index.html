@@ -2,11 +2,13 @@
 <head>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <style>
-.bar {fill:green;}
+.bar {fill:green;shape-rendering: crispEdges;}
 
 .axis path { fill: none; stroke: black; }
 .axis line { stroke: black; shape-rendering: crispEdges;}
 .axis text { font: 12px sans-serif; }
+
+p { width:60%;}
 
 </style>
 </head>
@@ -18,11 +20,19 @@
 <h2>Normal Distribution Mean</h2>
 <div id="normalMeanDis"></div>
 
+<p>Yes. It has roughly the same shape of a normal distribution as problem 2. It is however less defined given that we have a smaller sample set of 100 versus 1000. 
+It does not have the same x-scale. In Problem 2, the mean was to hover around 0 with a standard deviation of 1. In our normal mean distribution, we would expect the means
+collected from the 100 arrays to hover around the mean of the normal distribution itself which was 0. As a result, our x-scale doesn't extend from -3 to 3 like in Problem 1 but more tightly groups itself around 0 (e.g ~-0.06 to 0.6) once we take the mean. </p>
+
 <h2>Lognormal Distribution</h2>
 <div id="lognormalDis"></div>
 
 <h2>Lognormal Mean Distribution</h2>
 <div id="lognormalMeanDis"></div>
+<p>No. It does not have roughly the same shape as our lognormal distribution. In fact, the lognormal mean distribution looks similarly like the normal distribution exhibited 
+in Problem 1. In our lognormal distribution, our results are tightly grouped around 0-2 and quickly taper off with higher values. As a result, once we take the mean of 
+our lognormal array, we would expect the mean to hover around that area. Despite their lower frequency, the higher values still impact the overall mean. As a result, the mean 
+is not specifically centered on the highest frequence value ,1, but rather slightly right of it (e.g 1.5 - 2). The x-scale therefore is very much unlike the one from the previous problem. It is much narrower focusing on the means of the distribution itself which all will hover around the range mentioned above. </p>
 
 <h2>Exponential Distribution</h2>
 <div id="expoDis"></div>
@@ -30,17 +40,28 @@
 <h2>Exponential Mean Distribution</h2>
 <div id="expoMeanDis"></div>
 
+<p>The exponential distributon is similar in appearance to the lognormal distribution. Heavily concentrated in lower numbers and tapering off as the values increase. The scale is however different compared to the lognormal distribution as it does consist of lower values. Similar to the lognomrmal mean distribution, the exponential mean distribution looks disimilar 
+to the distribution it was derived from. It shows characteristics of a normal distribution as it takes the means of the exponential distribution from the previous problem. The x-scales are also fundamentally different given how each distribution was derived. While a significant majority of the values from the exponential mean distribution exist from 0 - 0.5, the x-scale for our exponential mean distribution is slightly skewed right (e.g 0.91 - 1.09) given the fact that the distribution tapers outward as values increase. </p>
+
 <h2>Gamma Distribution</h2>
 <div id="gammaDis"></div>
 
 <h2>Gamma Mean Distribution</h2>
 <div id="gammaMeanDis"></div>
 
+
+<p>At a=10, the gamma mean distribution does look similar to the distribution it was originally derived from. This is most due to the fact that at a=10, the gamma distribution
+does look similarly to a normal distribution. The mean distribution similar to the previous problems also looks very much similar to a normal distribution. The gamma distribution
+in contrast to the mean distribution is skewed to the left. The mean distribution is more centered such as a normal distribution would be. Similar to previous problems, the 
+x-scale is more central to the mean and of a much narrower range which is to be expected given that it was taken from the mean of the distribution itself. </p>
+
 <h2>Cauchy Distribution</h2>
 <div id="cauchyDis"></div>
 
 <h2>Cauchy Mean Distribution</h2>
 <div id="cauchyMeanDis"></div>
+
+<p></p>
 
 <script>
 function plotHistogram(elementID,numbersArray) {
@@ -51,9 +72,10 @@ function plotHistogram(elementID,numbersArray) {
 	var height = 500;
 	var width = 1000;
 	var padding = 40;
+	var paddingLeft = 80;
 	var svg = d3.select(elementID).append("svg").attr("height",height).attr("width",width);
 
-	var xScale = d3.scale.linear().domain([d3.min(numbersArray),d3.max(numbersArray)]).range([padding,width-padding]);
+	var xScale = d3.scale.linear().domain([d3.min(numbersArray),d3.max(numbersArray)]).range([paddingLeft,width-paddingLeft]);
 
 	var yScale = d3.scale.linear()
 	.domain([0,
@@ -67,24 +89,29 @@ function plotHistogram(elementID,numbersArray) {
 	svg.append("g")
 	    .attr("class", "x axis")
 	    .attr("transform", "translate(0," + (height-padding) + ")")
-	    .call(xAxis);
+	    .call(xAxis);	
 
 	var yAxisp = d3.svg.axis().scale(yScale).orient("left");
-	svg.append("g").attr("transform", "translate(" + padding + ",0)").attr("class", "axis")
+	svg.append("g").attr("transform", "translate(" + paddingLeft + ",0)").attr("class", "axis")
 	.call(yAxisp);
 
-	console.log(xScale(0));
+	svg.append("text").attr("class","label").attr("text-anchor","middle").attr("x",width/2).attr("y",height).text("Value");
+	svg.append("text")
+		.attr("class","label")
+		.attr("text-anchor","middle")
+		.attr("transform", "translate(20," + height/2 + ")rotate(-90)")
+		.text("Frequency");
 
 	data.forEach(function (bin) {
 		svg.append("rect").attr("class", "bar")
 		.attr("x", xScale(bin.x))
 		.attr("y", yScale(bin.y))
-		.attr("width", width/numberBins)
+		.attr("width", ((width-paddingLeft)/numberBins) )
 		.attr("height", yScale(0) - yScale(bin.y));});
 }
 
 function gaussian() { 
-	return d3.random.normal(0.0,1.0)(Math.random());	
+	return d3.random.normal()(Math.random());	
 	//return Math.random(d3.random.normal(0.0,1.0));
 }
 
@@ -140,8 +167,6 @@ function exponentialmean100() {
 	}
 
 	return exponentialmeanArray;
-
-
 }
 
 
@@ -157,7 +182,6 @@ function gamma1000() {
 		gammaSample = 0;
 	}
 	return gammaArray;
-
  }
 
 function gammamean100() { 
@@ -165,7 +189,6 @@ function gammamean100() {
 	for (gm=0;gm<100;gm++) { 
 		gammameanArray.push(d3.mean(gamma1000()));
 	}
-
 	return gammameanArray;
 }
 
@@ -175,7 +198,6 @@ function cauchy1000() {
 		cauchyArray.push((gaussian()/gaussian()));
 		console.log(gaussian()/gaussian());
 	}
-
 	return cauchyArray;
 }
 
@@ -184,14 +206,13 @@ function cauchymean100() {
 	for (y=0;y<100;y++) { 
 		cauchymeanArray.push(d3.mean(cauchy1000()));
 	}
-
 	return cauchymeanArray;
-
 }
 
 
 plotHistogram("#normalDis",gaussian1000());
 plotHistogram("#normalMeanDis",gaussian100mean());
+
 plotHistogram("#lognormalDis",lognormal1000());
 plotHistogram("#lognormalMeanDis",lognormalmean100());
 
