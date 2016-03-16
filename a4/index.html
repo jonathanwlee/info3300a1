@@ -2,17 +2,19 @@
 <head>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <style>
+body {padding:20px;}
 .bar {fill:green;shape-rendering: crispEdges;}
 
 .axis path { fill: none; stroke: black; }
 .axis line { stroke: black; shape-rendering: crispEdges;}
 .axis text { font: 12px sans-serif; }
 
-p { width:60%;}
+p { width:50%;}
 
 </style>
 </head>
 <body>
+<h1>Homework 4 - Jonathan Lee</h1> 
 
 <h2>Normal Distribution</h2>
 <div id="normalDis"></div>
@@ -83,7 +85,6 @@ function plotHistogram(elementID,numbersArray) {
 	var yScale = d3.scale.linear()
 	.domain([0,
 		d3.max(data, function (d) {
-			//console.log(d.y);
 			 return d.y;
 		 }) ])
 	.range([height- padding, padding]);
@@ -98,7 +99,13 @@ function plotHistogram(elementID,numbersArray) {
 	svg.append("g").attr("transform", "translate(" + paddingLeft + ",0)").attr("class", "axis")
 	.call(yAxisp);
 
-	svg.append("text").attr("class","label").attr("text-anchor","middle").attr("x",width/2).attr("y",height).text("Value");
+	svg.append("text")
+		.attr("class","label")
+		.attr("text-anchor","middle")
+		.attr("x",width/2)
+		.attr("y",height)
+		.text("Value");
+
 	svg.append("text")
 		.attr("class","label")
 		.attr("text-anchor","middle")
@@ -109,13 +116,13 @@ function plotHistogram(elementID,numbersArray) {
 		svg.append("rect").attr("class", "bar")
 		.attr("x", xScale(bin.x))
 		.attr("y", yScale(bin.y))
-		.attr("width", ((width-paddingLeft)/numberBins) )
+		.attr("width", ((width-2*paddingLeft)/numberBins) )
 		.attr("height", yScale(0) - yScale(bin.y));});
+
 }
 
 function gaussian() { 
 	return d3.random.normal()(Math.random());	
-	//return Math.random(d3.random.normal(0.0,1.0));
 }
 
 function gaussian1000() {
@@ -125,6 +132,7 @@ function gaussian1000() {
 	}
 
 	return gaussianArray; 
+
 }
 
 function gaussian100mean() { 
@@ -179,7 +187,6 @@ function gamma1000() {
 		var gammaSample;
 		for (n=0;n<10;n++) {
 			gammaSample = gammaSample + -Math.log(Math.random());
-			//console.log("ran" + n);
 		}
 		gammaArray.push(gammaSample);
 		gammaSample = 0;
@@ -199,7 +206,6 @@ function cauchy1000() {
 	var cauchyArray = [];
 	for (x=0;x<1000;x++) { 
 		cauchyArray.push((gaussian()/gaussian()));
-		console.log(gaussian()/gaussian());
 	}
 	return cauchyArray;
 }
@@ -224,7 +230,6 @@ plotHistogram("#expoMeanDis",exponentialmean100());
 
 plotHistogram("#cauchyDis",cauchy1000());
 plotHistogram("#cauchyMeanDis",cauchymean100());
-
 
 plotHistogram("#gammaDis",gamma1000());
 plotHistogram("#gammaMeanDis",gammamean100());
