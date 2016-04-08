@@ -3,7 +3,7 @@
 	<title>Assignment 6 - Jonathan Lee - jwl274 </title>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <style>
-svg { border: solid black 1px; }
+svg { border: solid black 1px; margin-top:30px;}
 
 </style>
 </head>
@@ -55,24 +55,45 @@ d3.csv("health.csv", function (error, data) {
 		return point.y;
 	})).range([height - padding, padding]);
 
+	lines = svg.selectAll("line").data(points);
+
+	// Each point has a line that is initially pointing to itself
+	lines.enter().append("line")
+	.attr("x1", function(d) { return xScale(d.x); })
+	.attr("y1", function(d) { return yScale(d.y); })
+	.attr("x2", function(d) { return xScale(d.x); })
+	.attr("y2", function(d) { return yScale(d.y); })
+	.style("stroke", "#aaa");
+
+
 	circles = svg.selectAll(".point").data(points);
 
 	// Create a mouseover callback that lists country names
-	circles.enter().append("circle")
+	circles.enter().append("text")
 	.attr("class", "point")
-	.attr("cx", function(d) { return xScale(d.x); })
-	.attr("cy", function(d) { return yScale(d.y); })
-	.attr("r", 3)
-	.style("fill", "green")
-	.style("opacity", 0.5);
-
+	.attr("x", function(d) { return xScale(d.x); })
+	.attr("y", function(d) { return yScale(d.y); })
+	.text(function(d) {return d.label; });
 
 	centroids = new Array(1);
+
 	for (var i = 0; i < centroids.length; i++) {
 		// Initialize from a randomly chosen point
 		var randomPoint = points[Math.floor(Math.random() * points.length)];
 		centroids[i] = { x: randomPoint.x, y: randomPoint.y };
+		points.forEach(function (point) { 
+			point.cluster = 0;
+		}
+			);
 	}
+	centroidCircles = svg.selectAll(".centroid").data(centroids);
+
+	// Create a mouseover callback that lists country names
+	centroidCircles.enter().append("circle")
+	.attr("class", "centroid")
+	.attr("x", function(d) { return xScale(d.x); })
+	.attr("y", function(d) { return yScale(d.y); })
+	.text(function(d) {return d.label; });
 });
 
 </script>
@@ -81,19 +102,66 @@ d3.csv("health.csv", function (error, data) {
 <script>
 
 function iterate(threshold) { 
+	var meanX = d3.mean(points, function(d) { return d.x;});
+	var meanY =d3.mean(points, function(d) { return d.y;});
+	var clusterChanged = 0; 
+	centroids[0] = { x: meanX, y: meanY };
+
+	points.forEach(function (point) {
+		var nearest;
+		var shortestDistance = Number.MAX_VALUE;
+		for (var i = 0; i < centroids.length; i++) {
+			var c = centroids[i];
+			
+			var distance = Math.sqrt( 
+				(c.x - point.x) * (c.x - point.x) +
+				(c.y - point.y) * (c.y - point.y)
+			);
+		
+			if (distance < shortestDistance) {
+				shortestDistance = distance;
+				nearest = i;
+			}
+		}
+
+		if (shortestDistance > threshold) {
+			centroids.push({ x: point.x , y: point.y});
+			nearest = i+1;
+		}
+		if (point.cluster != nearest) { clusterChanged+=1;}
+		point.cluster = nearest;
+
+		//console.log(clusterChanged);
+	});
+	return clusterChanged; 
 
 }
-
 
 function updateDisplay() { 
 
 }
 
 function cluster(threshold, display) { 
+	
+	while (iterate(threshold) > 0) { 
+		display();
+	}
+
+	//return number of non-empty clusters. 
+
 
 }
+
 </script>
 
+<div id="p2">
+
+<input type="range" min="0.5" max="10.0"> 
+</div>
+<script>
+var svgP2 = d3.select("#p2").append("svg").attr("height", height).attr("width", width);
+
+</script>
 
 
 </body> 
