@@ -5,6 +5,20 @@
 <style>
 svg { border: solid black 1px; margin-top:30px;}
 
+.point {font-size:1em;}
+
+.centroids {
+	font-size:1.8em;
+	text-align:center;
+}
+
+table {border-collapse: collapse;}
+th {text-align: left;}
+
+table, td,tr,th {
+	border: 1px solid black; 
+}
+
 </style>
 </head>
 
@@ -15,13 +29,12 @@ svg { border: solid black 1px; margin-top:30px;}
 
 var height = 300;
 var width = 300;
-var padding = 50;
+var padding = 40;
 
 var svg = d3.select("#p1").append("svg").attr("height", height).attr("width", width);
 var xScale, yScale;
 
-
-var lines, circles, clusterCircles;
+var lines, text, centroidText;
 
 var centroids, points;
 
@@ -40,8 +53,6 @@ d3.csv("health.csv", function (error, data) {
 		};
 	})
 	.filter(function (point) {
-		// Some countries are missing one or more data fields,
-		//  so silently drop them. Sorry Belgium!
 		return ! isNaN(point.x) && ! isNaN(point.y);
 	});
 
@@ -65,16 +76,6 @@ d3.csv("health.csv", function (error, data) {
 	.attr("y2", function(d) { return yScale(d.y); })
 	.style("stroke", "#aaa");
 
-
-	circles = svg.selectAll(".point").data(points);
-
-	// Create a mouseover callback that lists country names
-	circles.enter().append("text")
-	.attr("class", "point")
-	.attr("x", function(d) { return xScale(d.x); })
-	.attr("y", function(d) { return yScale(d.y); })
-	.text(function(d) {return d.label; });
-
 	centroids = new Array(1);
 
 	for (var i = 0; i < centroids.length; i++) {
@@ -83,31 +84,49 @@ d3.csv("health.csv", function (error, data) {
 		centroids[i] = { x: randomPoint.x, y: randomPoint.y };
 		points.forEach(function (point) { 
 			point.cluster = 0;
-		}
-			);
+		});
 	}
-	centroidCircles = svg.selectAll(".centroid").data(centroids);
 
-	// Create a mouseover callback that lists country names
-	centroidCircles.enter().append("circle")
-	.attr("class", "centroid")
+	text = svg.selectAll(".point").data(points);
+
+	text.enter().append("text")
+	.attr("class", "point")
 	.attr("x", function(d) { return xScale(d.x); })
 	.attr("y", function(d) { return yScale(d.y); })
-	.text(function(d) {return d.label; });
+	.text(function(d) {
+		return d.cluster;
+	});
+
+	lines.transition().duration(1000).attr("x2", function (point) {
+		return xScale(centroids[point.cluster].x);
+	})
+	.attr("y2", function (point) {
+		return yScale(centroids[point.cluster].y);
+	});
 });
+
+
 
 </script>
 
-
 <script>
-
 function iterate(threshold) { 
-	var meanX = d3.mean(points, function(d) { return d.x;});
-	var meanY =d3.mean(points, function(d) { return d.y;});
+	//var meanX = d3.mean(points, function(d) { return d.x;});
+	//var meanY =d3.mean(points, function(d) { return d.y;});
 	var clusterChanged = 0; 
-	centroids[0] = { x: meanX, y: meanY };
+	//centroids[0] = { x: meanX, y: meanY };
+
 
 	points.forEach(function (point) {
+
+		centroids.forEach(function (centroid, i) {
+		var assignedPoints = 
+			points.filter(function (point) { return point.cluster == i; });
+		
+		centroid.x = d3.mean(assignedPoints, function (point) { return point.x; });
+		centroid.y = d3.mean(assignedPoints, function (point) { return point.y; });
+		});
+
 		var nearest;
 		var shortestDistance = Number.MAX_VALUE;
 		for (var i = 0; i < centroids.length; i++) {
@@ -126,43 +145,161 @@ function iterate(threshold) {
 
 		if (shortestDistance > threshold) {
 			centroids.push({ x: point.x , y: point.y});
-			nearest = i+1;
+			nearest = i;
 		}
 		if (point.cluster != nearest) { clusterChanged+=1;}
 		point.cluster = nearest;
-
-		//console.log(clusterChanged);
 	});
-	return clusterChanged; 
 
+	return clusterChanged; 
 }
 
 function updateDisplay() { 
+	d3.selectAll(".point").text(function(d) { return d.cluster;});
+
+	centroidText = svg.selectAll(".centroids").data(centroids);
+
+
+	centroidText.enter().append("text")
+	.attr("class", "centroids")
+	.attr("x", function(d) { return xScale(d.x); })
+	.attr("y", function(d) { return yScale(d.y); })
+	.text(function(d) {
+		return "A1";
+	});
+
+
+	centroidText.exit().remove();
+
+
+	lines.transition().duration(1000).attr("x2", function (point) {
+		return xScale(centroids[point.cluster].x);
+	})
+	.attr("y2", function (point) {
+		return yScale(centroids[point.cluster].y);
+	});
 
 }
 
-function cluster(threshold, display) { 
-	
+function cluster(threshold, display) { 		
+	centroids = new Array(1);
+	for (var i = 0; i < centroids.length; i++) {
+		// Initialize from a randomly chosen point
+		var randomPoint = points[Math.floor(Math.random() * points.length)];
+		centroids[i] = { x: randomPoint.x, y: randomPoint.y };
+		points.forEach(function (point) { 
+			point.cluster = 0;
+		});
+	}
+
+	var numberEmpty = 0;
 	while (iterate(threshold) > 0) { 
 		display();
 	}
 
 	//return number of non-empty clusters. 
+	for (var c=0;c < centroids.length; c++) { 
+		var contains = false;
+		for (var d=0; d < points.length;d++)  { 
+			if (points[d].cluster == c) { 
+				contains = true; 
+			}
+		} 
 
-
+		if (contains == false)  {
+			numberEmpty+=1;
+		}
+	}
+	return numberEmpty; 
 }
-
 </script>
 
-<div id="p2">
 
-<input type="range" min="0.5" max="10.0"> 
+<input id="slider" type="range" min="0.5" max="10.0" step="0.5" onmouseup="sliderFunction()"> 
+
 </div>
 <script>
-var svgP2 = d3.select("#p2").append("svg").attr("height", height).attr("width", width);
-
+function sliderFunction() { 
+var rangeThreshold = document.getElementById("slider").value;
+console.log(rangeThreshold);
+cluster(rangeThreshold,updateDisplay);
+}
 </script>
+<table>
+<tr>
+<th></th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+</tr>
 
+<tr>
+<th>1</th>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+
+<tr>
+<th>2</th>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+
+<tr>
+<th>3</th>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+
+<tr>
+<th>4</th>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+</table>
+
+<p>
+
+</p>
 
 </body> 
 </html>
