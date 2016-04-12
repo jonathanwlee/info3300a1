@@ -6,10 +6,12 @@
 svg { border: solid black 1px; margin-top:30px;}
 
 .point {
-	font-size:0.7em;
+	font-size:1em;
 }
 .centroids {
-	font-size:1.8em;
+	font-size:2em;
+	fill:red;
+	opacity:0.7;
 }	
 
 table {border-collapse: collapse;}
@@ -63,6 +65,15 @@ d3.csv("health.csv", function (error, data) {
 
 	lines = svg.selectAll("line").data(points);
 
+	centroids = new Array(1);
+	var randomPoint = points[Math.floor(Math.random() * points.length)];
+	centroids[0] = { x: randomPoint.x, y: randomPoint.y };
+	points.forEach(function (point) { 
+		point.cluster = 0;
+	});
+
+	centroidText = svg.selectAll(".centroids").data(centroids);
+
 	// Each point has a line that is initially pointing to itself
 	lines.enter().append("line")
 	.attr("x1", function(d) { return xScale(d.x); })
@@ -70,15 +81,6 @@ d3.csv("health.csv", function (error, data) {
 	.attr("x2", function(d) { return xScale(d.x); })
 	.attr("y2", function(d) { return yScale(d.y); })
 	.style("stroke", "#aaa");
-
-	centroids = new Array(1);
-	var randomPoint = points[Math.floor(Math.random() * points.length)];
-	centroids[0] = { x: randomPoint.x, y: randomPoint.y };
-	points.forEach(function (point) { 
-		point.cluster = 0;
-	});
-	centroidText = svg.selectAll(".centroids").data(centroids);
-
 	text = svg.selectAll(".point").data(points);
 
 	text.enter().append("text")
@@ -86,7 +88,7 @@ d3.csv("health.csv", function (error, data) {
 	.attr("x", function(d) { return xScale(d.x); })
 	.attr("y", function(d) { return yScale(d.y); })
 	.text(function(d) {
-		return d.cluster;
+		return String.fromCharCode(9633 + d.cluster);
 	});
 
 	lines.transition().duration(1000).attr("x2", function (point) {
@@ -95,6 +97,15 @@ d3.csv("health.csv", function (error, data) {
 	.attr("y2", function (point) {
 		return yScale(centroids[point.cluster].y);
 	});
+
+	centroidText.enter().append("text")
+	.attr("class", "centroids")
+	.attr("x", function(d) { return xScale(d.x); })
+	.attr("y", function(d) { return yScale(d.y); })
+	.text(function(d,i) {
+		return String.fromCharCode(9633 + i);
+	});
+
 	//Populating Arrays to Answer Question 3
 	/*
 	threshold1Array = populateClusterArray(threshold1);
@@ -147,7 +158,7 @@ function iterate(threshold) {
 
 function updateDisplay() { 
 	//Update Points Text 
-	d3.selectAll(".point").text(function(d) { return d.cluster;});
+
 
 	//Update Cluster Text 
 	centroidText = svg.selectAll(".centroids").data(centroids);
@@ -159,9 +170,10 @@ function updateDisplay() {
 	.attr("class", "centroids")
 	.attr("x", function(d) { return xScale(d.x); })
 	.attr("y", function(d) { return yScale(d.y); })
-	.text(function(d) {
-		return "A1";
+	.text(function(d,i) {
+		return String.fromCharCode(9633 + i);
 	});
+
 
 	centroidText.exit().remove();
 
@@ -170,6 +182,10 @@ function updateDisplay() {
 	})
 	.attr("y2", function (point) {
 		return yScale(centroids[point.cluster].y);
+	});
+
+	d3.selectAll(".point").text(function(d) {
+	 return String.fromCharCode(9633 + d.cluster);
 	});
 
 }
@@ -243,7 +259,7 @@ function populateClusterArray(thresholdValue) {
 
 <tr>
 <th><script>document.write("Threshold: " + threshold1);</script></th>
-<td><script>document.write(threshold1Array[0]);</script></td>
+<td>40</td>
 <td>40</td>
 <td>40</td>
 <td>40</td>
