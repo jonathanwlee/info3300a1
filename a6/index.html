@@ -95,6 +95,13 @@ d3.csv("health.csv", function (error, data) {
 	.attr("y2", function (point) {
 		return yScale(centroids[point.cluster].y);
 	});
+	//Populating Arrays to Answer Question 3
+	/*
+	threshold1Array = populateClusterArray(threshold1);
+	threshold2Array = populateClusterArray(threshold2);
+	threshold3Array = populateClusterArray(threshold3);
+	threshold4Array = populateClusterArray(threshold4);
+	*/
 });
 </script>
 
@@ -184,23 +191,8 @@ function cluster(threshold, display) {
 		display();
 	}
 
-	//return number of non-empty clusters. 
-	/*for (var c=0;c < centroids.length; c++) { 
-		var contains = false;
-		for (var d=0; d < points.length;d++)  { 
-			if (points[d].cluster == c) { 
-				contains = true; 
-			}
-		} 
-
-		if (contains == false)  {
-			numberEmpty+=1;
-		}
-	}*/
-
-	return numberEmpty; 
+	return centroids.length; 
 }
-
 </script>
 
 
@@ -210,79 +202,99 @@ function cluster(threshold, display) {
 <script>
 function sliderFunction() { 
 	var rangeThreshold = document.getElementById("slider").value;
-	//console.log(rangeThreshold);
 	cluster(rangeThreshold,updateDisplay);
 }
+
+</script>
+<script>
+var threshold1 = 1;
+var threshold2 = 2;
+var threshold3 = 4;
+var threshold4 = 7;
+
+var threshold1Array = [];
+var threshold2Array = [];
+var threshold3Array = [];
+var threshold4Array = [];
+
+function populateClusterArray(thresholdValue) { 
+	var populatedArray = [];
+	for (var g=0;g<10;g++) { 
+		populatedArray.push(cluster(thresholdValue,updateDisplay));
+	}
+	return populatedArray; 
+}
+
 </script>
 <table>
 <tr>
 <th></th>
-<th>1</th>
-<th>2</th>
-<th>3</th>
-<th>4</th>
-<th>5</th>
-<th>6</th>
-<th>7</th>
-<th>8</th>
-<th>9</th>
-<th>10</th>
+<th>T1</th>
+<th>T2</th>
+<th>T3</th>
+<th>T4</th>
+<th>T5</th>
+<th>T6</th>
+<th>T7</th>
+<th>T8</th>
+<th>T9</th>
+<th>T10</th>
 </tr>
 
 <tr>
-<th>1</th>
-<td>1</td>
-<td>2</td>
-<td>3</td>
-<td>4</td>
-<td>5</td>
-<td>6</td>
-<td>7</td>
-<td>8</td>
-<td>9</td>
-<td>10</td>
+<th><script>document.write("Threshold: " + threshold1);</script></th>
+<td><script>document.write(threshold1Array[0]);</script></td>
+<td>40</td>
+<td>40</td>
+<td>40</td>
+<td>40</td>
+<td>40</td>
+<td>40</td>
+<td>40</td>
+<td>40</td>
+<td>40</td>
 </tr>
 
 <tr>
-<th>2</th>
-<td>1</td>
-<td>2</td>
-<td>3</td>
-<td>4</td>
-<td>5</td>
-<td>6</td>
+<th><script>document.write("Threshold: " + threshold2);</script></th>
 <td>7</td>
-<td>8</td>
-<td>9</td>
-<td>10</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
 </tr>
 
 <tr>
-<th>3</th>
-<td>1</td>
-<td>2</td>
-<td>3</td>
-<td>4</td>
-<td>5</td>
-<td>6</td>
-<td>7</td>
-<td>8</td>
-<td>9</td>
-<td>10</td>
+<th><script>document.write("Threshold: " + threshold3);</script></th>
+<td>17</td>
+<td>17</td>
+<td>17</td>
+<td>17</td>
+<td>17</td>
+<td>17</td>
+<td>17</td>
+<td>17</td>
+<td>17</td>
+<td>17</td>
 </tr>
 
 <tr>
-<th>4</th>
-<td>1</td>
-<td>2</td>
+<th><script>document.write("Threshold: " + threshold4);</script></th>
 <td>3</td>
-<td>4</td>
-<td>5</td>
-<td>6</td>
-<td>7</td>
-<td>8</td>
-<td>9</td>
-<td>10</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
 </tr>
 </table>
 
