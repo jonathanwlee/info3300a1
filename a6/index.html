@@ -5,12 +5,12 @@
 <style>
 svg { border: solid black 1px; margin-top:30px;}
 
-.point {font-size:1em;}
-
+.point {
+	font-size:0.7em;
+}
 .centroids {
 	font-size:1.8em;
-	text-align:center;
-}
+}	
 
 table {border-collapse: collapse;}
 th {text-align: left;}
@@ -26,7 +26,6 @@ table, td,tr,th {
 <h1>Assignment 6 - Jonathan Lee (jwl274)</h1>
 <div id="p1"></div>
 <script>
-
 var height = 300;
 var width = 300;
 var padding = 40;
@@ -35,15 +34,11 @@ var svg = d3.select("#p1").append("svg").attr("height", height).attr("width", wi
 var xScale, yScale;
 
 var lines, text, centroidText;
-
 var centroids, points;
-
 var countries;
-
 
 d3.csv("health.csv", function (error, data) {
 	countries = data;
-
 	points = countries.map(function (country) {
 		// Create shorter variable names
 		return {
@@ -77,15 +72,12 @@ d3.csv("health.csv", function (error, data) {
 	.style("stroke", "#aaa");
 
 	centroids = new Array(1);
-
-	for (var i = 0; i < centroids.length; i++) {
-		// Initialize from a randomly chosen point
-		var randomPoint = points[Math.floor(Math.random() * points.length)];
-		centroids[i] = { x: randomPoint.x, y: randomPoint.y };
-		points.forEach(function (point) { 
-			point.cluster = 0;
-		});
-	}
+	var randomPoint = points[Math.floor(Math.random() * points.length)];
+	centroids[0] = { x: randomPoint.x, y: randomPoint.y };
+	points.forEach(function (point) { 
+		point.cluster = 0;
+	});
+	centroidText = svg.selectAll(".centroids").data(centroids);
 
 	text = svg.selectAll(".point").data(points);
 
@@ -104,29 +96,12 @@ d3.csv("health.csv", function (error, data) {
 		return yScale(centroids[point.cluster].y);
 	});
 });
-
-
-
 </script>
 
 <script>
 function iterate(threshold) { 
-	//var meanX = d3.mean(points, function(d) { return d.x;});
-	//var meanY =d3.mean(points, function(d) { return d.y;});
-	var clusterChanged = 0; 
-	//centroids[0] = { x: meanX, y: meanY };
-
-
+	var clusterChanged =0;
 	points.forEach(function (point) {
-
-		centroids.forEach(function (centroid, i) {
-		var assignedPoints = 
-			points.filter(function (point) { return point.cluster == i; });
-		
-		centroid.x = d3.mean(assignedPoints, function (point) { return point.x; });
-		centroid.y = d3.mean(assignedPoints, function (point) { return point.y; });
-		});
-
 		var nearest;
 		var shortestDistance = Number.MAX_VALUE;
 		for (var i = 0; i < centroids.length; i++) {
@@ -145,20 +120,33 @@ function iterate(threshold) {
 
 		if (shortestDistance > threshold) {
 			centroids.push({ x: point.x , y: point.y});
-			nearest = i;
+			nearest = centroids.length-1;
 		}
-		if (point.cluster != nearest) { clusterChanged+=1;}
-		point.cluster = nearest;
-	});
 
+		if (point.cluster != nearest) { clusterChanged+=1;}
+
+		point.cluster = nearest;
+
+		centroids.forEach(function (centroid, i) {
+			var assignedPoints = 
+				points.filter(function (point) { return point.cluster == i; });
+			centroid.x = d3.mean(assignedPoints, function (point) { return point.x; });
+			centroid.y = d3.mean(assignedPoints, function (point) { return point.y; });
+		});
+
+	});
 	return clusterChanged; 
 }
 
 function updateDisplay() { 
+	//Update Points Text 
 	d3.selectAll(".point").text(function(d) { return d.cluster;});
 
+	//Update Cluster Text 
 	centroidText = svg.selectAll(".centroids").data(centroids);
 
+	centroidText.attr("x", function(d) { return xScale(d.x); })
+	.attr("y", function(d) { return yScale(d.y); });
 
 	centroidText.enter().append("text")
 	.attr("class", "centroids")
@@ -168,9 +156,7 @@ function updateDisplay() {
 		return "A1";
 	});
 
-
 	centroidText.exit().remove();
-
 
 	lines.transition().duration(1000).attr("x2", function (point) {
 		return xScale(centroids[point.cluster].x);
@@ -183,22 +169,23 @@ function updateDisplay() {
 
 function cluster(threshold, display) { 		
 	centroids = new Array(1);
-	for (var i = 0; i < centroids.length; i++) {
-		// Initialize from a randomly chosen point
-		var randomPoint = points[Math.floor(Math.random() * points.length)];
-		centroids[i] = { x: randomPoint.x, y: randomPoint.y };
-		points.forEach(function (point) { 
-			point.cluster = 0;
-		});
-	}
+	var randomPoint = points[Math.floor(Math.random() * points.length)];
+	centroids[0] = { x: randomPoint.x, y: randomPoint.y };
+	points.forEach(function (point) { 
+		point.cluster = 0;
+	});
+
+	console.log(centroids.length);
 
 	var numberEmpty = 0;
-	while (iterate(threshold) > 0) { 
+	var rIterate = Number.MAX_VALUE;
+	while (rIterate > 0) { 
+		rIterate = iterate(threshold);
 		display();
 	}
 
 	//return number of non-empty clusters. 
-	for (var c=0;c < centroids.length; c++) { 
+	/*for (var c=0;c < centroids.length; c++) { 
 		var contains = false;
 		for (var d=0; d < points.length;d++)  { 
 			if (points[d].cluster == c) { 
@@ -209,9 +196,11 @@ function cluster(threshold, display) {
 		if (contains == false)  {
 			numberEmpty+=1;
 		}
-	}
+	}*/
+
 	return numberEmpty; 
 }
+
 </script>
 
 
@@ -220,9 +209,9 @@ function cluster(threshold, display) {
 </div>
 <script>
 function sliderFunction() { 
-var rangeThreshold = document.getElementById("slider").value;
-console.log(rangeThreshold);
-cluster(rangeThreshold,updateDisplay);
+	var rangeThreshold = document.getElementById("slider").value;
+	//console.log(rangeThreshold);
+	cluster(rangeThreshold,updateDisplay);
 }
 </script>
 <table>
