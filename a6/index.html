@@ -63,7 +63,7 @@ d3.csv("health.csv", function (error, data) {
 		return point.y;
 	})).range([height - padding, padding]);
 
-	lines = svg.selectAll("line").data(points);
+	//lines = svg.selectAll("line").data(points);
 
 	centroids = new Array(1);
 	var randomPoint = points[Math.floor(Math.random() * points.length)];
@@ -75,44 +75,44 @@ d3.csv("health.csv", function (error, data) {
 	centroidText = svg.selectAll(".centroids").data(centroids);
 
 	// Each point has a line that is initially pointing to itself
-	lines.enter().append("line")
+/*	lines.enter().append("line")
 	.attr("x1", function(d) { return xScale(d.x); })
 	.attr("y1", function(d) { return yScale(d.y); })
 	.attr("x2", function(d) { return xScale(d.x); })
 	.attr("y2", function(d) { return yScale(d.y); })
 	.style("stroke", "#aaa");
+	*/
 	text = svg.selectAll(".point").data(points);
-
 	text.enter().append("text")
 	.attr("class", "point")
 	.attr("x", function(d) { return xScale(d.x); })
 	.attr("y", function(d) { return yScale(d.y); })
 	.text(function(d) {
-		return String.fromCharCode(9633 + d.cluster);
+		return String.fromCharCode(9634 + d.cluster);
 	});
 
-	lines.transition().duration(1000).attr("x2", function (point) {
+/*	lines.transition().duration(1000).attr("x2", function (point) {
 		return xScale(centroids[point.cluster].x);
 	})
 	.attr("y2", function (point) {
 		return yScale(centroids[point.cluster].y);
-	});
+	});*/
 
 	centroidText.enter().append("text")
 	.attr("class", "centroids")
 	.attr("x", function(d) { return xScale(d.x); })
 	.attr("y", function(d) { return yScale(d.y); })
 	.text(function(d,i) {
-		return String.fromCharCode(9633 + i);
+		return String.fromCharCode(9634 + i);
 	});
 
 	//Populating Arrays to Answer Question 3
-	/*
-	threshold1Array = populateClusterArray(threshold1);
+	
+	/*threshold1Array = populateClusterArray(threshold1);
 	threshold2Array = populateClusterArray(threshold2);
 	threshold3Array = populateClusterArray(threshold3);
-	threshold4Array = populateClusterArray(threshold4);
-	*/
+	threshold4Array = populateClusterArray(threshold4);*/
+	
 });
 </script>
 
@@ -145,13 +145,13 @@ function iterate(threshold) {
 
 		point.cluster = nearest;
 
-		centroids.forEach(function (centroid, i) {
-			var assignedPoints = 
-				points.filter(function (point) { return point.cluster == i; });
-			centroid.x = d3.mean(assignedPoints, function (point) { return point.x; });
-			centroid.y = d3.mean(assignedPoints, function (point) { return point.y; });
-		});
+	});
 
+	centroids.forEach(function (centroid, i) {
+		var assignedPoints = 
+			points.filter(function (point) { return point.cluster == i; });
+		centroid.x = d3.mean(assignedPoints, function (point) { return point.x; });
+		centroid.y = d3.mean(assignedPoints, function (point) { return point.y; });
 	});
 	return clusterChanged; 
 }
@@ -171,21 +171,21 @@ function updateDisplay() {
 	.attr("x", function(d) { return xScale(d.x); })
 	.attr("y", function(d) { return yScale(d.y); })
 	.text(function(d,i) {
-		return String.fromCharCode(9633 + i);
+		return String.fromCharCode(9634 + i);
 	});
 
 
 	centroidText.exit().remove();
-
+/*
 	lines.transition().duration(1000).attr("x2", function (point) {
 		return xScale(centroids[point.cluster].x);
 	})
 	.attr("y2", function (point) {
 		return yScale(centroids[point.cluster].y);
-	});
+	});*/
 
 	d3.selectAll(".point").text(function(d) {
-	 return String.fromCharCode(9633 + d.cluster);
+	 return String.fromCharCode(9634 + d.cluster);
 	});
 
 }
