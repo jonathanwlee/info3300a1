@@ -8,6 +8,7 @@ svg { border: solid black 1px; margin-top:30px;}
 .point {
 	font-size:1em;
 }
+
 .centroids {
 	font-size:2em;
 	fill:red;
@@ -19,6 +20,10 @@ th {text-align: left;}
 
 table, td,tr,th {
 	border: 1px solid black; 
+}
+
+p { 
+width: 40%;
 }
 
 </style>
@@ -53,6 +58,7 @@ d3.csv("health.csv", function (error, data) {
 		return ! isNaN(point.x) && ! isNaN(point.y);
 	});
 
+	//Scales from 3/25 Notes 
 	xScale = d3.scale.linear()
 	.domain(d3.extent(points, function (point) {
 		return point.x;
@@ -63,8 +69,7 @@ d3.csv("health.csv", function (error, data) {
 		return point.y;
 	})).range([height - padding, padding]);
 
-	//lines = svg.selectAll("line").data(points);
-
+	//Set Random Centroid and Initiate Clusters to 0
 	centroids = new Array(1);
 	var randomPoint = points[Math.floor(Math.random() * points.length)];
 	centroids[0] = { x: randomPoint.x, y: randomPoint.y };
@@ -75,13 +80,6 @@ d3.csv("health.csv", function (error, data) {
 	centroidText = svg.selectAll(".centroids").data(centroids);
 
 	// Each point has a line that is initially pointing to itself
-/*	lines.enter().append("line")
-	.attr("x1", function(d) { return xScale(d.x); })
-	.attr("y1", function(d) { return yScale(d.y); })
-	.attr("x2", function(d) { return xScale(d.x); })
-	.attr("y2", function(d) { return yScale(d.y); })
-	.style("stroke", "#aaa");
-	*/
 	text = svg.selectAll(".point").data(points);
 	text.enter().append("text")
 	.attr("class", "point")
@@ -90,13 +88,6 @@ d3.csv("health.csv", function (error, data) {
 	.text(function(d) {
 		return String.fromCharCode(9634 + d.cluster);
 	});
-
-/*	lines.transition().duration(1000).attr("x2", function (point) {
-		return xScale(centroids[point.cluster].x);
-	})
-	.attr("y2", function (point) {
-		return yScale(centroids[point.cluster].y);
-	});*/
 
 	centroidText.enter().append("text")
 	.attr("class", "centroids")
@@ -107,17 +98,19 @@ d3.csv("health.csv", function (error, data) {
 	});
 
 	//Populating Arrays to Answer Question 3
-	
-	/*threshold1Array = populateClusterArray(threshold1);
+	/*
+	threshold1Array = populateClusterArray(threshold1);
 	threshold2Array = populateClusterArray(threshold2);
 	threshold3Array = populateClusterArray(threshold3);
-	threshold4Array = populateClusterArray(threshold4);*/
+	threshold4Array = populateClusterArray(threshold4);
+	*/
 	
 });
 </script>
 
 <script>
 function iterate(threshold) { 
+	//Large Portion of Code from 3/25 Notes 
 	var clusterChanged =0;
 	points.forEach(function (point) {
 		var nearest;
@@ -144,26 +137,25 @@ function iterate(threshold) {
 		if (point.cluster != nearest) { clusterChanged+=1;}
 
 		point.cluster = nearest;
-
 	});
 
+	//Re-assign means
 	centroids.forEach(function (centroid, i) {
 		var assignedPoints = 
 			points.filter(function (point) { return point.cluster == i; });
 		centroid.x = d3.mean(assignedPoints, function (point) { return point.x; });
 		centroid.y = d3.mean(assignedPoints, function (point) { return point.y; });
 	});
+
 	return clusterChanged; 
 }
 
 function updateDisplay() { 
-	//Update Points Text 
-
-
-	//Update Cluster Text 
+	//Update Cluster Unicode Characters 
 	centroidText = svg.selectAll(".centroids").data(centroids);
 
-	centroidText.attr("x", function(d) { return xScale(d.x); })
+	centroidText
+	.attr("x", function(d) { return xScale(d.x); })
 	.attr("y", function(d) { return yScale(d.y); });
 
 	centroidText.enter().append("text")
@@ -174,23 +166,17 @@ function updateDisplay() {
 		return String.fromCharCode(9634 + i);
 	});
 
-
 	centroidText.exit().remove();
-/*
-	lines.transition().duration(1000).attr("x2", function (point) {
-		return xScale(centroids[point.cluster].x);
-	})
-	.attr("y2", function (point) {
-		return yScale(centroids[point.cluster].y);
-	});*/
 
+	//Update Points Unicode Character 
 	d3.selectAll(".point").text(function(d) {
 	 return String.fromCharCode(9634 + d.cluster);
 	});
 
 }
 
-function cluster(threshold, display) { 		
+function cluster(threshold, display) { 	
+	//Reset Centroid to random point and intialize point clusters to 0 	
 	centroids = new Array(1);
 	var randomPoint = points[Math.floor(Math.random() * points.length)];
 	centroids[0] = { x: randomPoint.x, y: randomPoint.y };
@@ -198,10 +184,9 @@ function cluster(threshold, display) {
 		point.cluster = 0;
 	});
 
-	console.log(centroids.length);
 
-	var numberEmpty = 0;
 	var rIterate = Number.MAX_VALUE;
+	//Iterate until returns 0
 	while (rIterate > 0) { 
 		rIterate = iterate(threshold);
 		display();
@@ -212,16 +197,20 @@ function cluster(threshold, display) {
 </script>
 
 
-<input id="slider" type="range" min="0.5" max="10.0" step="0.5" onmouseup="sliderFunction()"> 
+<input id="slider" type="range" min="0.5" max="10.0" step="0.5" onchange="sliderFunction()"> 
+<input id="textInput" type="text" value="">
 
 </div>
+
 <script>
 function sliderFunction() { 
 	var rangeThreshold = document.getElementById("slider").value;
 	cluster(rangeThreshold,updateDisplay);
-}
+	document.getElementById('textInput').value=rangeThreshold; 
 
+}
 </script>
+
 <script>
 var threshold1 = 1;
 var threshold2 = 2;
@@ -233,6 +222,7 @@ var threshold2Array = [];
 var threshold3Array = [];
 var threshold4Array = [];
 
+//Used to populate arrays for answering question 3
 function populateClusterArray(thresholdValue) { 
 	var populatedArray = [];
 	for (var g=0;g<10;g++) { 
@@ -240,8 +230,8 @@ function populateClusterArray(thresholdValue) {
 	}
 	return populatedArray; 
 }
-
 </script>
+
 <table>
 <tr>
 <th></th>
@@ -260,12 +250,12 @@ function populateClusterArray(thresholdValue) {
 <tr>
 <th><script>document.write("Threshold: " + threshold1);</script></th>
 <td>40</td>
+<td>39</td>
 <td>40</td>
 <td>40</td>
 <td>40</td>
 <td>40</td>
-<td>40</td>
-<td>40</td>
+<td>39</td>
 <td>40</td>
 <td>40</td>
 <td>40</td>
@@ -273,49 +263,52 @@ function populateClusterArray(thresholdValue) {
 
 <tr>
 <th><script>document.write("Threshold: " + threshold2);</script></th>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
+<td>16</td>
+<td>16</td>
+<td>16</td>
+<td>16</td>
+<td>15</td>
+<td>15</td>
+<td>17</td>
+<td>15</td>
+<td>16</td>
+<td>16</td>
 </tr>
 
 <tr>
 <th><script>document.write("Threshold: " + threshold3);</script></th>
-<td>17</td>
-<td>17</td>
-<td>17</td>
-<td>17</td>
-<td>17</td>
-<td>17</td>
-<td>17</td>
-<td>17</td>
-<td>17</td>
-<td>17</td>
+<td>6</td>
+<td>8</td>
+<td>7</td>
+<td>7</td>
+<td>6</td>
+<td>8</td>
+<td>7</td>
+<td>8</td>
+<td>7</td>
+<td>7</td>
 </tr>
 
 <tr>
 <th><script>document.write("Threshold: " + threshold4);</script></th>
+<td>4</td>
 <td>3</td>
 <td>3</td>
 <td>3</td>
 <td>3</td>
 <td>3</td>
 <td>3</td>
-<td>3</td>
-<td>3</td>
+<td>4</td>
 <td>3</td>
 <td>3</td>
 </tr>
 </table>
 
 <p>
-
+The four values I chose as interesting spanned the range of threshold values with particular attention to the low spectrum of values. 
+<br><br>
+The threshold parameter determines to an extent how many clusters there are. A higher threshold value will lead to a low number of clusters while an extremely low threshold value will lead to a high number of clusters. Intuitively, this makes sense. Lower thresholds would necessitate points to be much closer to each other to be within the same cluster. High threshold values afford larger distances away from the cluster centroid.  <br><br>
+Yes, I would believe them. Outside of setting a wanted threshold, the algorithm allows the data to speak for itself as it doesn't require human intervention to come to a consistent number of clusters every iteration no matter the threshold. At most, the number of clusters differed by plus or minus one. The only variability of clusters is caused by the initial randomly selected point. In contrast to the k-means algorithm, which requires us to pick a predetermined number of clusters, the Kulis-Jordan algorithm merely requires users to specify how tightly together clusters should be. After that, the iterative algorithm defines dynamic cluster centroids and assigns points to clusters in the fashion specified.  
 </p>
 
 </body> 
